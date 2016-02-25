@@ -1,0 +1,17 @@
+<!--
+  ~ Copyright (c) 2016. David de Andrés and Juan Carlos Ruiz, DISCA - UPV, Development of apps for mobile devices.
+  -->
+
+<resources>
+    <string name="app_name">L05.01_ThreadsAndAsyncTasks</string>
+    <string name="not_working_button">Test the problem</string>
+    <string name="thread_message_button">Thread and Message</string>
+    <string name="thread_runnable_button">Thread and Runnable</string>
+    <string name="asynctask_button">AsyncTask</string>
+    <string name="progress">%1d/100</string>
+    <string name="start_button">Start</string>
+    <string name="continue_button">Continue</string>
+    <string name="pause_button">Pause</string>
+    <string name="stop_button">Stop</string>
+    <string name="still_wont_work">This will not work while the count is in progress</string>
+</resources>
