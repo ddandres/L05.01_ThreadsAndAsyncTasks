@@ -4,14 +4,16 @@
 
 package labs.sdm.l0501_threadsandasynctasks;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import java.lang.ref.WeakReference;
 
 /*
 * Displays a count using a ProgressBar and a TextView.
@@ -41,11 +43,11 @@ public class ThreadMessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_problem);
 
-            /*
+        /*
         * Keep a reference to:
         *   the ProgressBar displaying the current progress of the count (init 0, max 100)
         *   the TextView displaying the progress of the count in text format (x/100)
-        *   the Buttons to start, pause/continue and stop the count
+        *   the Buttons to start, pause/resume and stop the count
         * */
         progressBar = (ProgressBar) findViewById(R.id.pbProgress);
         tvProgress = (TextView) findViewById(R.id.tvProgress);
@@ -57,7 +59,7 @@ public class ThreadMessageActivity extends AppCompatActivity {
         tvProgress.setText(String.format(getResources().getString(R.string.progress), 0));
 
         // Create the Handler associated to the UI (main) thread
-        handler = new CountHandler();
+        handler = new CountHandler(this);
 
     }
 
@@ -85,11 +87,11 @@ public class ThreadMessageActivity extends AppCompatActivity {
     }
 
     /*
-    * Handles the event to pause/unpause the count.
+    * Handles the event to pause/resume the count.
     * */
-    public void pauseCount() {
+    private void pauseCount() {
 
-        // Pause/Unpause the background thread
+        // Pause/Resume the background thread
         thread.setPause(!thread.isPause());
 
         // Change the text of the button depending on the state of the background thread
@@ -113,7 +115,7 @@ public class ThreadMessageActivity extends AppCompatActivity {
     /*
     * Handles the event to stop the count.
     * */
-    public void stopCount() {
+    private void stopCount() {
 
         // Stop the background thread
         thread.setStop(true);
@@ -151,15 +153,15 @@ public class ThreadMessageActivity extends AppCompatActivity {
         // Message to notify IU thread about any update
         Message message;
 
-        public void setStop(boolean stop) {
+        void setStop(boolean stop) {
             this.stop = stop;
         }
 
-        public void setPause(boolean pause) {
+        void setPause(boolean pause) {
             this.pause = pause;
         }
 
-        public boolean isPause() {
+        boolean isPause() {
             return pause;
         }
 
@@ -213,13 +215,23 @@ public class ThreadMessageActivity extends AppCompatActivity {
     /*
     * Process messages associated to the UI (main) Thread.
     * */
-    private class CountHandler extends Handler {
+    static class CountHandler extends Handler {
+
+        private final WeakReference<ThreadMessageActivity> reference;
+
+        CountHandler(ThreadMessageActivity activity) {
+            super();
+
+            this.reference = new WeakReference<>(activity);
+        }
 
         /*
-        * Receives and processes a message.
-        * */
+                * Receives and processes a message.
+                * */
         @Override
         public void handleMessage(Message msg) {
+
+            final ThreadMessageActivity activity = reference.get();
 
             // Determine what to do depending on the Message received
             switch (msg.what) {
@@ -229,13 +241,13 @@ public class ThreadMessageActivity extends AppCompatActivity {
                     // Get progress from Message
                     int progress = (int) msg.obj;
                     // Update UI elements accordingly
-                    progressBar.setProgress(progress);
-                    tvProgress.setText(String.format(
-                            getResources().getString(R.string.progress), progress));
+                    activity.progressBar.setProgress(progress);
+                    activity.tvProgress.setText(String.format(
+                            activity.getResources().getString(R.string.progress), progress));
                     break;
 
                 case COUNT_FINISHED:
-                    resetUI();
+                    activity.resetUI();
                     break;
             }
         }

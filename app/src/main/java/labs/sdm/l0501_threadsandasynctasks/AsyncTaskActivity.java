@@ -137,15 +137,15 @@ public class AsyncTaskActivity extends AppCompatActivity {
         // Stop the count (ends the thread)
         private boolean stop;
 
-        public void setStop(boolean stop) {
+        void setStop(boolean stop) {
             this.stop = stop;
         }
 
-        public void setPause(boolean pause) {
+        void setPause(boolean pause) {
             this.pause = pause;
         }
 
-        public boolean isPause() {
+        boolean isPause() {
             return pause;
         }
 
