@@ -4,8 +4,8 @@
 
 package labs.sdm.l0501_threadsandasynctasks;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -37,11 +37,11 @@ public class TestProblemActivity extends AppCompatActivity {
         *   the TextView displaying the progress of the count in text format (x/100)
         *   the Buttons to start, pause/continue and stop the count
         * */
-        progressBar = (ProgressBar) findViewById(R.id.pbProgress);
-        tvProgress = (TextView) findViewById(R.id.tvProgress);
-        bStart = (Button) findViewById(R.id.bStart);
-        bPause = (Button) findViewById(R.id.bPause);
-        bStop = (Button) findViewById(R.id.bStop);
+        progressBar = findViewById(R.id.pbProgress);
+        tvProgress = findViewById(R.id.tvProgress);
+        bStart = findViewById(R.id.bStart);
+        bPause = findViewById(R.id.bPause);
+        bStop = findViewById(R.id.bStop);
 
         // Set the initial value of the count to 0
         tvProgress.setText(String.format(getResources().getString(R.string.progress), 0));

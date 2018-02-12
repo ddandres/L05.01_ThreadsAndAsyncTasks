@@ -41,11 +41,11 @@ public class ThreadRunnableActivity extends AppCompatActivity {
         *   the TextView displaying the progress of the count in text format (x/100)
         *   the Buttons to start, pause/continue and stop the count
         * */
-        progressBar = (ProgressBar) findViewById(R.id.pbProgress);
-        tvProgress = (TextView) findViewById(R.id.tvProgress);
-        bStart = (Button) findViewById(R.id.bStart);
-        bPause = (Button) findViewById(R.id.bPause);
-        bStop = (Button) findViewById(R.id.bStop);
+        progressBar = findViewById(R.id.pbProgress);
+        tvProgress = findViewById(R.id.tvProgress);
+        bStart = findViewById(R.id.bStart);
+        bPause = findViewById(R.id.bPause);
+        bStop = findViewById(R.id.bStop);
 
         // Set the initial value of the count to 0
         tvProgress.setText(String.format(getResources().getString(R.string.progress), 0));
@@ -109,7 +109,7 @@ public class ThreadRunnableActivity extends AppCompatActivity {
     public void stopCount() {
 
         // Stop the background thread
-        thread.setStop(true);
+        thread.setStop();
         // Wait for the background thread to die
         try {
             thread.join();
@@ -144,8 +144,8 @@ public class ThreadRunnableActivity extends AppCompatActivity {
         // Stop the count (ends the thread)
         private boolean stop;
 
-        void setStop(boolean stop) {
-            this.stop = stop;
+        void setStop() {
+            this.stop = true;
         }
 
         void setPause(boolean pause) {

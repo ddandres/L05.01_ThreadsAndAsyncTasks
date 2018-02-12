@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
+
 /*
 * Displays a count using a ProgressBar and a TextView.
 * The count is executed on background using an AsyncTask, and
@@ -40,11 +42,11 @@ public class AsyncTaskActivity extends AppCompatActivity {
         *   the TextView displaying the progress of the count in text format (x/100)
         *   the Buttons to start, pause/continue and stop the count
         * */
-        progressBar = (ProgressBar) findViewById(R.id.pbProgress);
-        tvProgress = (TextView) findViewById(R.id.tvProgress);
-        bStart = (Button) findViewById(R.id.bStart);
-        bPause = (Button) findViewById(R.id.bPause);
-        bStop = (Button) findViewById(R.id.bStop);
+        progressBar = findViewById(R.id.pbProgress);
+        tvProgress = findViewById(R.id.tvProgress);
+        bStart = findViewById(R.id.bStart);
+        bPause = findViewById(R.id.bPause);
+        bStop = findViewById(R.id.bStop);
 
         // Set the initial value of the count to 0
         tvProgress.setText(String.format(getResources().getString(R.string.progress), 0));
@@ -62,7 +64,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
         bStop.setEnabled(true);
 
         // Create new asynchronous task (cannot be reused)
-        task = new CountAsyncTask();
+        task = new CountAsyncTask(this);
         // Run the task
         task.execute(progressBar.getMax());
     }
@@ -105,7 +107,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
     public void stopCount() {
 
         // Stop the background thread
-        task.setStop(true);
+        task.setStop();
 
         resetUI();
     }
@@ -125,20 +127,22 @@ public class AsyncTaskActivity extends AppCompatActivity {
     /*
     * Performs the count in background, notifies the UI through the available interface.
     * */
-    private class CountAsyncTask extends AsyncTask<Integer, Integer, Void> {
+    private static class CountAsyncTask extends AsyncTask<Integer, Integer, Void> {
+
+        private final WeakReference<AsyncTaskActivity> activity;
 
         // Current value of the count
-        int currentProgress;
+        private int currentProgress;
         // Maximum value of the count
-        int maxProgress;
+        private int maxProgress;
 
         // Pause the count
         private boolean pause;
         // Stop the count (ends the thread)
         private boolean stop;
 
-        void setStop(boolean stop) {
-            this.stop = stop;
+        void setStop() {
+            this.stop = true;
         }
 
         void setPause(boolean pause) {
@@ -149,9 +153,13 @@ public class AsyncTaskActivity extends AppCompatActivity {
             return pause;
         }
 
+        CountAsyncTask(AsyncTaskActivity activity) {
+            this.activity = new WeakReference<>(activity);
+        }
+
         /*
-        * Increases the count each 50ms until reaching the maximum count or the thread is stopped.
-        * */
+         * Increases the count each 50ms until reaching the maximum count or the thread is stopped.
+         * */
         @Override
         protected Void doInBackground(Integer... params) {
             // Starting new count, so do not pause nor stop the count
@@ -191,16 +199,16 @@ public class AsyncTaskActivity extends AppCompatActivity {
             // Get progress from Message
             int progress = values[0];
             // Update UI elements accordingly
-            progressBar.setProgress(progress);
-            tvProgress.setText(String.format(
-                    getResources().getString(R.string.progress), progress));
+            this.activity.get().progressBar.setProgress(progress);
+            this.activity.get().tvProgress.setText(String.format(
+                    this.activity.get().getString(R.string.progress), progress));
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             // The count has reached its end, so notify the main thread
             if (currentProgress == maxProgress) {
-                resetUI();
+                this.activity.get().resetUI();
             }
         }
     }
