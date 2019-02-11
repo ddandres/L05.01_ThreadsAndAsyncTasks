@@ -9,7 +9,7 @@
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="labs.sdm.l0501_threadsandasynctasks.DashboardActivity">
+    tools:context=".DashboardActivity">
 
     <Button
         android:id="@+id/bProblem"

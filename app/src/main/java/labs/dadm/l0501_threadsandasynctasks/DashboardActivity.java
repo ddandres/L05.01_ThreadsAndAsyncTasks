@@ -2,17 +2,17 @@
  * Copyright (c) 2016. David de Andrés and Juan Carlos Ruiz, DISCA - UPV, Development of apps for mobile devices.
  */
 
-package labs.sdm.l0501_threadsandasynctasks;
+package labs.dadm.l0501_threadsandasynctasks;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 /*
-* Displays a set of Buttons that give access to test problem of dealing with
-* background tasks and updating the UI from them.
-* */
+ * Displays a set of Buttons that give access to test problem of dealing with
+ * background tasks and updating the UI from them.
+ * */
 public class DashboardActivity extends AppCompatActivity {
 
     @Override
@@ -22,8 +22,8 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     /*
-    * Starts the different activities of the application
-    * */
+     * Starts the different activities of the application
+     * */
     public void launchActivity(View view) {
 
         Intent intent = null;
