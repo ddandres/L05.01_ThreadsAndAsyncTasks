@@ -6,11 +6,12 @@ package labs.dadm.l0501_threadsandasynctasks;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.ref.WeakReference;
 
@@ -18,7 +19,7 @@ import java.lang.ref.WeakReference;
  * Displays a count using a ProgressBar and a TextView.
  * The count is executed on background using an AsyncTask, and
  * updates are notified to the UI via the available interface.
- * */
+ */
 public class AsyncTaskActivity extends AppCompatActivity {
 
     // Hold references to View objects
@@ -41,7 +42,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
          *   the ProgressBar displaying the current progress of the count (init 0, max 100)
          *   the TextView displaying the progress of the count in text format (x/100)
          *   the Buttons to start, pause/continue and stop the count
-         * */
+         */
         progressBar = findViewById(R.id.pbProgress);
         tvProgress = findViewById(R.id.tvProgress);
         bStart = findViewById(R.id.bStart);
@@ -55,7 +56,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
     /*
      * Handles the event to start the count.
-     * */
+     */
     public void startCount(View view) {
 
         // The count starts, so disable the start button and enable the other two
@@ -71,14 +72,14 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
     /*
      * Handles the event to pause/unpause the count.
-     * */
+     */
     public void pauseCount(View view) {
         pauseCount();
     }
 
     /*
      * Handles the event to pause the count.
-     * */
+     */
     public void pauseCount() {
 
         // Pause/Unpause the background thread
@@ -96,14 +97,14 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
     /*
      * Handles the event to stop the count.
-     * */
+     */
     public void stopCount(View view) {
         stopCount();
     }
 
     /*
      * Handles the event to stop the count.
-     * */
+     */
     public void stopCount() {
 
         // Stop the background thread
@@ -114,7 +115,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
     /*
      * Sets the UI to its initial state
-     * */
+     */
     private void resetUI() {
         // Display the Pause text
         bPause.setText(R.string.pause_button);
@@ -126,7 +127,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
     /*
      * Performs the count in background, notifies the UI through the available interface.
-     * */
+     */
     private static class CountAsyncTask extends AsyncTask<Integer, Integer, Void> {
 
         private final WeakReference<AsyncTaskActivity> activity;
@@ -159,7 +160,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
         /*
          * Increases the count each 50ms until reaching the maximum count or the thread is stopped.
-         * */
+         */
         @Override
         protected Void doInBackground(Integer... params) {
             // Starting new count, so do not pause nor stop the count
@@ -193,7 +194,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
         /*
          * Update the ProgressBar and the TextView with the new value
-         * */
+         */
         @Override
         protected void onProgressUpdate(Integer... values) {
             // Get progress from Message
@@ -215,7 +216,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
     /*
      * Pauses the task when the activity is going to be paused
-     * */
+     */
     @Override
     protected void onPause() {
         // If the background thread is running then pause it
@@ -227,7 +228,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
     /*
      * Stops the task when the activity is going to be destroyed
-     * */
+     */
     @Override
     protected void onDestroy() {
         // If the background thread is running then stop it

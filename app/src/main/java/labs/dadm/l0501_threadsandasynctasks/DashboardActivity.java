@@ -6,8 +6,9 @@ package labs.dadm.l0501_threadsandasynctasks;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /*
  * Displays a set of Buttons that give access to test problem of dealing with
