@@ -10,12 +10,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.ref.WeakReference;
 
 /*
+ * THIS CLASS HAS BEEN DEPRECATED IN API LEVEL 30
  * Displays a count using a ProgressBar and a TextView.
  * The count is executed on background using an AsyncTask, and
  * updates are notified to the UI via the available interface.
@@ -51,7 +53,12 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
         // Set the initial value of the count to 0
         tvProgress.setText(String.format(getResources().getString(R.string.progress), 0));
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Toast.makeText(this, R.string.deprecated, Toast.LENGTH_SHORT).show();
     }
 
     /*
@@ -175,7 +182,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
             // Keep counting until the maximum threshold is reached or the count is requested to stop
             while ((currentProgress < maxProgress) && !stop) {
                 try {
-                    // Wait for 50ms
+                    // Busy-wait for 50ms
                     Thread.sleep(50);
 
                     // Increase the count only when it is not paused

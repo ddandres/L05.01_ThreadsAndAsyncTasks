@@ -184,7 +184,7 @@ public class ThreadMessageActivity extends AppCompatActivity {
             // Keep counting until the maximum threshold is reached or the count is requested to stop
             while ((currentProgress < maxProgress) && !stop) {
                 try {
-                    // Wait for 50ms
+                    // Busy-wait for 50ms
                     Thread.sleep(50);
 
                     // Increase the count only when it is not paused

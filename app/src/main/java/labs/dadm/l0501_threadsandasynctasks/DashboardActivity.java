@@ -30,26 +30,19 @@ public class DashboardActivity extends AppCompatActivity {
         Intent intent = null;
 
         // Determine what to do depending on the Button clicked
-        switch (view.getId()) {
+        final int buttonClicked = view.getId();
+        if (buttonClicked == R.id.bProblem) {
             // Activity showing the actual problem
-            case R.id.bProblem:
-                intent = new Intent(DashboardActivity.this, TestProblemActivity.class);
-                break;
-
+            intent = new Intent(DashboardActivity.this, TestProblemActivity.class);
+        } else if (buttonClicked == R.id.bThreadmessage) {
             // Solution using Thread and Message
-            case R.id.bThreadmessage:
-                intent = new Intent(DashboardActivity.this, ThreadMessageActivity.class);
-                break;
-
+            intent = new Intent(DashboardActivity.this, ThreadMessageActivity.class);
+        } else if (buttonClicked == R.id.bThreadRunnable) {
             // Solution using Thread and Runnable
-            case R.id.bThreadRunnable:
-                intent = new Intent(DashboardActivity.this, ThreadRunnableActivity.class);
-                break;
-
+            intent = new Intent(DashboardActivity.this, ThreadRunnableActivity.class);
+        } else if (buttonClicked == R.id.bAsyncTask) {
             // Solution using AsyncTask
-            case R.id.bAsyncTask:
-                intent = new Intent(DashboardActivity.this, AsyncTaskActivity.class);
-                break;
+            intent = new Intent(DashboardActivity.this, AsyncTaskActivity.class);
         }
         startActivity(intent);
     }
