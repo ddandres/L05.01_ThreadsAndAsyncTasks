@@ -7,6 +7,7 @@
     <string name="not_working_button">Test the problem</string>
     <string name="thread_message_button">Thread and Message</string>
     <string name="thread_runnable_button">Thread and Runnable</string>
+    <string name="thread_runonui_button">Thread and RunOnUiThread()</string>
     <string name="asynctask_button">AsyncTask</string>
     <string name="progress">%1d/100</string>
     <string name="start_button">Start</string>

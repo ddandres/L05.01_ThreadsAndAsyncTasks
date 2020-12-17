@@ -1,28 +1,18 @@
-/*
- * Copyright (c) 2016. David de Andrés and Juan Carlos Ruiz, DISCA - UPV, Development of apps for mobile devices.
- */
-
 package labs.dadm.l0501_threadsandasynctasks;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.ref.WeakReference;
 
-/*
- * THIS CLASS HAS BEEN DEPRECATED IN API LEVEL 30
- * Displays a count using a ProgressBar and a TextView.
- * The count is executed on background using an AsyncTask, and
- * updates are notified to the UI via the available interface.
- */
-public class AsyncTaskActivity extends AppCompatActivity {
+public class ThreadRunOnUiActivity extends AppCompatActivity {
 
     // Maximum count value
     static private final int MAX_COUNT = 100;
@@ -34,8 +24,8 @@ public class AsyncTaskActivity extends AppCompatActivity {
     Button bPause;
     Button bStop;
 
-    // Hold references to the background Thread and the UI Handler
-    CountAsyncTask task;
+    // Hold references to the background Thread
+    ThreadRunOnUiActivity.CountThread thread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +46,7 @@ public class AsyncTaskActivity extends AppCompatActivity {
 
         // Set the initial value of the count to 0
         tvProgress.setText(String.format(getResources().getString(R.string.progress), 0));
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Toast.makeText(this, R.string.deprecated, Toast.LENGTH_SHORT).show();
     }
 
     /*
@@ -74,10 +59,10 @@ public class AsyncTaskActivity extends AppCompatActivity {
         bPause.setEnabled(true);
         bStop.setEnabled(true);
 
-        // Create new asynchronous task (cannot be reused)
-        task = new CountAsyncTask(this);
-        // Run the task
-        task.execute(progressBar.getMax());
+        // Create new background thread (cannot be reused once started)
+        thread = new ThreadRunOnUiActivity.CountThread(this);
+        // Run the background thread
+        thread.start();
     }
 
     /*
@@ -88,15 +73,15 @@ public class AsyncTaskActivity extends AppCompatActivity {
     }
 
     /*
-     * Handles the event to pause the count.
+     * Handles the event to pause/unpause the count.
      */
     public void pauseCount() {
 
         // Pause/Unpause the background thread
-        task.setPause(!task.isPause());
+        thread.setPause(!thread.isPause());
 
         // Change the text of the button depending on the state of the background thread
-        if (task.isPause()) {
+        if (thread.isPause()) {
             // Thread is paused, so display Continue text
             bPause.setText(R.string.continue_button);
         } else {
@@ -118,15 +103,30 @@ public class AsyncTaskActivity extends AppCompatActivity {
     public void stopCount() {
 
         // Stop the background thread
-        task.setStop();
+        thread.setStop();
+        // Wait for the background thread to die
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        resetUI();
+        finishCount();
+    }
+
+    /*
+     * Updates the ProgressBar and the TextView with the new value
+     */
+    public void updateCount(int count) {
+        progressBar.setProgress(count);
+        tvProgress.setText(String.format(
+                getResources().getString(R.string.progress), count));
     }
 
     /*
      * Sets the UI to its initial state
      */
-    private void resetUI() {
+    public void finishCount() {
         // Display the Pause text
         bPause.setText(R.string.pause_button);
         // The count has ended, so enable the start button and disable the other two
@@ -136,19 +136,18 @@ public class AsyncTaskActivity extends AppCompatActivity {
     }
 
     /*
-     * Performs the count in background, notifies the UI through the available interface.
+     * Performs the count in background, notifies the UI through a Message.
      */
-    private static class CountAsyncTask extends AsyncTask<Integer, Integer, Void> {
-
-        private final WeakReference<AsyncTaskActivity> activity;
+    private class CountThread extends Thread {
 
         // Current value of the count
-        private int currentProgress;
-
+        int currentProgress;
         // Pause the count
         private boolean pause;
         // Stop the count (ends the thread)
         private boolean stop;
+
+        WeakReference<ThreadRunOnUiActivity> reference;
 
         void setStop() {
             this.stop = true;
@@ -162,20 +161,22 @@ public class AsyncTaskActivity extends AppCompatActivity {
             return pause;
         }
 
-        CountAsyncTask(AsyncTaskActivity activity) {
-            this.activity = new WeakReference<>(activity);
+        CountThread(ThreadRunOnUiActivity activity) {
+            super();
+            this.reference = new WeakReference<>(activity);
         }
 
         /*
          * Increases the count each 50ms until reaching the maximum count or the thread is stopped.
          */
         @Override
-        protected Void doInBackground(Integer... params) {
+        public void run() {
+
             // Starting new count, so do not pause nor stop the count
             pause = false;
             stop = false;
 
-            // Current value of the count (init 0)
+            // Start count from 0
             currentProgress = 0;
 
             // Keep counting until the maximum threshold is reached or the count is requested to stop
@@ -188,57 +189,46 @@ public class AsyncTaskActivity extends AppCompatActivity {
                     if (!pause) {
                         // Increase the count
                         currentProgress++;
-                        // Notify the UI thread about the current progress of the count
-                        publishProgress(currentProgress);
+                        // The Runnable is sent to the UI thread
+                        if (reference.get() != null) {
+                            runOnUiThread(() -> reference.get().updateCount(currentProgress));
+                        }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            return null;
-        }
 
-        /*
-         * Update the ProgressBar and the TextView with the new value
-         */
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            // Get progress from Message
-            int progress = values[0];
-            // Update UI elements accordingly
-            this.activity.get().progressBar.setProgress(progress);
-            this.activity.get().tvProgress.setText(String.format(
-                    this.activity.get().getString(R.string.progress), progress));
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
             // The count has reached its end, so notify the main thread
             if (currentProgress == MAX_COUNT) {
-                this.activity.get().resetUI();
+                // The Runnable is sent to the UI thread
+                // Reset the UI to its initial state
+                if (reference.get() != null) {
+                    runOnUiThread(() -> reference.get().finishCount());
+                }
             }
         }
     }
 
     /*
-     * Pauses the task when the activity is going to be paused
+     * Pauses the thread when the activity is going to be paused
      */
     @Override
     protected void onPause() {
         // If the background thread is running then pause it
-        if ((task != null) && !task.isPause()) {
+        if ((thread != null) && thread.isAlive() && !thread.isPause()) {
             pauseCount();
         }
         super.onPause();
     }
 
     /*
-     * Stops the task when the activity is going to be destroyed
+     * Stops the thread when the activity is going to be destroyed
      */
     @Override
     protected void onDestroy() {
         // If the background thread is running then stop it
-        if (task != null) {
+        if ((thread != null) && thread.isAlive()) {
             stopCount();
         }
         super.onDestroy();

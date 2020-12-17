@@ -10,7 +10,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".DashboardActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="unspecified">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,7 +20,7 @@
         <activity
             android:name=".TestProblemActivity"
             android:parentActivityName=".DashboardActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="unspecified">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DashboardActivity" />
@@ -28,7 +28,7 @@
         <activity
             android:name=".ThreadMessageActivity"
             android:parentActivityName=".DashboardActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="unspecified">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DashboardActivity" />
@@ -36,7 +36,7 @@
         <activity
             android:name=".ThreadRunnableActivity"
             android:parentActivityName=".DashboardActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="unspecified">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DashboardActivity" />
@@ -44,11 +44,20 @@
         <activity
             android:name=".AsyncTaskActivity"
             android:parentActivityName=".DashboardActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="unspecified">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DashboardActivity" />
         </activity>
+        <activity
+            android:name=".ThreadRunOnUiActivity"
+            android:parentActivityName=".DashboardActivity"
+            android:screenOrientation="unspecified">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DashboardActivity" />
+        </activity>
+
     </application>
 
 </manifest>

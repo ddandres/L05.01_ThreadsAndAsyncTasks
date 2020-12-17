@@ -40,6 +40,9 @@ public class DashboardActivity extends AppCompatActivity {
         } else if (buttonClicked == R.id.bThreadRunnable) {
             // Solution using Thread and Runnable
             intent = new Intent(DashboardActivity.this, ThreadRunnableActivity.class);
+        } else if (buttonClicked == R.id.bThreadRunOnUi) {
+            // Solution using Thread and Runnable
+            intent = new Intent(DashboardActivity.this, ThreadRunOnUiActivity.class);
         } else if (buttonClicked == R.id.bAsyncTask) {
             // Solution using AsyncTask
             intent = new Intent(DashboardActivity.this, AsyncTaskActivity.class);

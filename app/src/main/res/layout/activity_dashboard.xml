@@ -45,10 +45,23 @@
         android:layout_marginStart="8dp"
         android:onClick="launchActivity"
         android:text="@string/thread_runnable_button"
-        app:layout_constraintBottom_toTopOf="@+id/bAsyncTask"
+        app:layout_constraintBottom_toTopOf="@+id/bThreadRunOnUi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bThreadmessage" />
+
+    <Button
+        android:id="@+id/bThreadRunOnUi"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:onClick="launchActivity"
+        android:text="@string/thread_runonui_button"
+        app:layout_constraintBottom_toTopOf="@+id/bAsyncTask"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bThreadRunnable" />
 
     <Button
         android:id="@+id/bAsyncTask"
@@ -61,6 +74,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bThreadRunnable" />
+        app:layout_constraintTop_toBottomOf="@+id/bThreadRunOnUi" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

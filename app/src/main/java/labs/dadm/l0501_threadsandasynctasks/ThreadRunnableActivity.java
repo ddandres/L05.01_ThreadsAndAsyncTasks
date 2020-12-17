@@ -6,6 +6,7 @@ package labs.dadm.l0501_threadsandasynctasks;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -13,12 +14,17 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.lang.ref.WeakReference;
+
 /*
  * Displays a count using a ProgressBar and a TextView.
  * The count is executed on background using a thread, and
  * updates are notified to the UI via a Runnable.
  */
 public class ThreadRunnableActivity extends AppCompatActivity {
+
+    // Maximum count value
+    static private final int MAX_COUNT = 100;
 
     // Hold references to View objects
     ProgressBar progressBar;
@@ -29,7 +35,6 @@ public class ThreadRunnableActivity extends AppCompatActivity {
 
     // Hold references to the background Thread and the UI Handler
     CountThread thread;
-    Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +55,6 @@ public class ThreadRunnableActivity extends AppCompatActivity {
 
         // Set the initial value of the count to 0
         tvProgress.setText(String.format(getResources().getString(R.string.progress), 0));
-
-        // Create the Handler associated to the UI (main) thread
-        handler = new Handler();
-
     }
 
     /*
@@ -67,7 +68,7 @@ public class ThreadRunnableActivity extends AppCompatActivity {
         bStop.setEnabled(true);
 
         // Create new background thread (cannot be reused once started)
-        thread = new CountThread();
+        thread = new CountThread(this);
         // Run the background thread
         thread.start();
     }
@@ -118,13 +119,22 @@ public class ThreadRunnableActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        resetUI();
+        finishCount();
+    }
+
+    /*
+     * Updates the ProgressBar and the TextView with the new value
+     */
+    public void updateCount(int count) {
+        progressBar.setProgress(count);
+        tvProgress.setText(String.format(
+                getResources().getString(R.string.progress), count));
     }
 
     /*
      * Sets the UI to its initial state
      */
-    private void resetUI() {
+    public void finishCount() {
         // Display the Pause text
         bPause.setText(R.string.pause_button);
         // The count has ended, so enable the start button and disable the other two
@@ -136,7 +146,7 @@ public class ThreadRunnableActivity extends AppCompatActivity {
     /*
      * Performs the count in background, notifies the UI through a Message.
      */
-    private class CountThread extends Thread {
+    private static class CountThread extends Thread {
 
         // Current value of the count
         int currentProgress;
@@ -144,6 +154,8 @@ public class ThreadRunnableActivity extends AppCompatActivity {
         private boolean pause;
         // Stop the count (ends the thread)
         private boolean stop;
+
+        WeakReference<ThreadRunnableActivity> reference;
 
         void setStop() {
             this.stop = true;
@@ -157,11 +169,19 @@ public class ThreadRunnableActivity extends AppCompatActivity {
             return pause;
         }
 
+        CountThread(ThreadRunnableActivity activity) {
+            super();
+            this.reference = new WeakReference<>(activity);
+        }
+
         /*
          * Increases the count each 50ms until reaching the maximum count or the thread is stopped.
          */
         @Override
         public void run() {
+
+            // Create the Handler associated to the UI (main) thread
+            Handler handler = new Handler(Looper.getMainLooper());
 
             // Starting new count, so do not pause nor stop the count
             pause = false;
@@ -169,11 +189,9 @@ public class ThreadRunnableActivity extends AppCompatActivity {
 
             // Start count from 0
             currentProgress = 0;
-            // Maximum value of the count
-            int maxProgress = progressBar.getMax();
 
             // Keep counting until the maximum threshold is reached or the count is requested to stop
-            while ((currentProgress < maxProgress) && !stop) {
+            while ((currentProgress < MAX_COUNT) && !stop) {
                 try {
                     // Busy-wait for 50ms
                     Thread.sleep(50);
@@ -183,15 +201,9 @@ public class ThreadRunnableActivity extends AppCompatActivity {
                         // Increase the count
                         currentProgress++;
                         // The Runnable is added to the message queue of the UI thread, which will execute it
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Update the ProgressBar and the TextView with the new value
-                                progressBar.setProgress(currentProgress);
-                                tvProgress.setText(String.format(
-                                        getResources().getString(R.string.progress), currentProgress));
-                            }
-                        });
+                        if (reference.get() != null) {
+                            handler.post(() -> reference.get().updateCount(currentProgress));
+                        }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -199,15 +211,12 @@ public class ThreadRunnableActivity extends AppCompatActivity {
             }
 
             // The count has reached its end, so notify the main thread
-            if (currentProgress == maxProgress) {
+            if (currentProgress == MAX_COUNT) {
                 // The Runnable is added to the message queue of the UI thread, which will execute it
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Reset the UI to its initial state
-                        resetUI();
-                    }
-                });
+                // Reset the UI to its initial state
+                if (reference.get() != null) {
+                    handler.post(() -> reference.get().finishCount());
+                }
             }
         }
     }

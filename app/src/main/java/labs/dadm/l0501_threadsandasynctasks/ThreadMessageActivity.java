@@ -27,6 +27,8 @@ public class ThreadMessageActivity extends AppCompatActivity {
     static private final int UPDATE_PROGRESS = 0;
     // Identifies a message notifying that the count has reached its end
     static private final int COUNT_FINISHED = 1;
+    // Maximum count value
+    static private final int MAX_COUNT = 100;
 
     // Hold references to View objects
     ProgressBar progressBar;
@@ -178,11 +180,9 @@ public class ThreadMessageActivity extends AppCompatActivity {
 
             // Current value of the count (init 0)
             int currentProgress = 0;
-            // Maximum value of the count
-            int maxProgress = progressBar.getMax();
 
             // Keep counting until the maximum threshold is reached or the count is requested to stop
-            while ((currentProgress < maxProgress) && !stop) {
+            while ((currentProgress < MAX_COUNT) && !stop) {
                 try {
                     // Busy-wait for 50ms
                     Thread.sleep(50);
@@ -203,7 +203,7 @@ public class ThreadMessageActivity extends AppCompatActivity {
             }
 
             // The count has reached its end, so notify the main thread
-            if (currentProgress == maxProgress) {
+            if (currentProgress == MAX_COUNT) {
                 // Message to notify the main thread that the count has reached its end
                 // Includes the Handler and what the message is about
                 message = Message.obtain(handler, COUNT_FINISHED);
@@ -216,7 +216,7 @@ public class ThreadMessageActivity extends AppCompatActivity {
     /*
      * Process messages associated to the UI (main) Thread.
      */
-    static class CountHandler extends Handler {
+    private static class CountHandler extends Handler {
 
         private final WeakReference<ThreadMessageActivity> reference;
 
