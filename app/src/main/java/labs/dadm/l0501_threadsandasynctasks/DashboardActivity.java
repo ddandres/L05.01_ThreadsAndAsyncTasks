@@ -10,27 +10,27 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-/*
- * Displays a set of Buttons that give access to test problem of dealing with
- * background tasks and updating the UI from them.
- * */
+// Displays a set of Buttons that give access to test problem of dealing with
+// background tasks and updating the UI from them.
 public class DashboardActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+
+        final View.OnClickListener listener = v -> launchActivity(v.getId());
+        findViewById(R.id.bProblem).setOnClickListener(listener);
+        findViewById(R.id.bThreadmessage).setOnClickListener(listener);
+        findViewById(R.id.bThreadRunnable).setOnClickListener(listener);
+        findViewById(R.id.bThreadRunOnUi).setOnClickListener(listener);
+        findViewById(R.id.bAsyncTask).setOnClickListener(listener);
     }
 
-    /*
-     * Starts the different activities of the application
-     * */
-    public void launchActivity(View view) {
-
+    // Starts the different activities of the application
+    public void launchActivity(int buttonClicked) {
         Intent intent = null;
-
         // Determine what to do depending on the Button clicked
-        final int buttonClicked = view.getId();
         if (buttonClicked == R.id.bProblem) {
             // Activity showing the actual problem
             intent = new Intent(DashboardActivity.this, TestProblemActivity.class);

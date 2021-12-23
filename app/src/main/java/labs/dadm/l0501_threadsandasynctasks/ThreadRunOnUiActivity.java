@@ -1,9 +1,6 @@
 package labs.dadm.l0501_threadsandasynctasks;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -12,6 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.ref.WeakReference;
 
+// Displays a count using a ProgressBar and a TextView.
+// The count is executed on background using a thread, and
+// updates are notified to the UI via runOnUiThread().
 public class ThreadRunOnUiActivity extends AppCompatActivity {
 
     // Maximum count value
@@ -32,28 +32,26 @@ public class ThreadRunOnUiActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_problem);
 
-        /*
-         * Keep a reference to:
-         *   the ProgressBar displaying the current progress of the count (init 0, max 100)
-         *   the TextView displaying the progress of the count in text format (x/100)
-         *   the Buttons to start, pause/continue and stop the count
-         */
+        // Keep a reference to:
+        // the ProgressBar displaying the current progress of the count (init 0, max 100)
+        // the TextView displaying the progress of the count in text format (x/100)
+        // the Buttons to start, pause/continue and stop the count
         progressBar = findViewById(R.id.pbProgress);
         tvProgress = findViewById(R.id.tvProgress);
         bStart = findViewById(R.id.bStart);
         bPause = findViewById(R.id.bPause);
         bStop = findViewById(R.id.bStop);
 
+        findViewById(R.id.bStart).setOnClickListener(v -> startCount());
+        findViewById(R.id.bPause).setOnClickListener(v -> pauseCount());
+        findViewById(R.id.bStop).setOnClickListener(v -> stopCount());
+
         // Set the initial value of the count to 0
         tvProgress.setText(String.format(getResources().getString(R.string.progress), 0));
-
     }
 
-    /*
-     * Handles the event to start the count.
-     */
-    public void startCount(View view) {
-
+    // Handles the event to start the count.
+    private void startCount() {
         // The count starts, so disable the start button and enable the other two
         bStart.setEnabled(false);
         bPause.setEnabled(true);
@@ -65,18 +63,8 @@ public class ThreadRunOnUiActivity extends AppCompatActivity {
         thread.start();
     }
 
-    /*
-     * Handles the event to pause/unpause the count.
-     */
-    public void pauseCount(View view) {
-        pauseCount();
-    }
-
-    /*
-     * Handles the event to pause/unpause the count.
-     */
-    public void pauseCount() {
-
+    // Handles the event to pause/resume the count.
+    private void pauseCount() {
         // Pause/Unpause the background thread
         thread.setPause(!thread.isPause());
 
@@ -90,18 +78,8 @@ public class ThreadRunOnUiActivity extends AppCompatActivity {
         }
     }
 
-    /*
-     * Handles the event to stop the count.
-     */
-    public void stopCount(View view) {
-        stopCount();
-    }
-
-    /*
-     * Handles the event to stop the count.
-     */
-    public void stopCount() {
-
+    // Handles the event to stop the count.
+    private void stopCount() {
         // Stop the background thread
         thread.setStop();
         // Wait for the background thread to die
@@ -114,18 +92,14 @@ public class ThreadRunOnUiActivity extends AppCompatActivity {
         finishCount();
     }
 
-    /*
-     * Updates the ProgressBar and the TextView with the new value
-     */
+    // Updates the ProgressBar and the TextView with the new value
     public void updateCount(int count) {
         progressBar.setProgress(count);
         tvProgress.setText(String.format(
                 getResources().getString(R.string.progress), count));
     }
 
-    /*
-     * Sets the UI to its initial state
-     */
+    // Sets the UI to its initial state
     public void finishCount() {
         // Display the Pause text
         bPause.setText(R.string.pause_button);
@@ -135,11 +109,8 @@ public class ThreadRunOnUiActivity extends AppCompatActivity {
         bStop.setEnabled(false);
     }
 
-    /*
-     * Performs the count in background, notifies the UI through a Message.
-     */
+    // Performs the count in background, notifies the UI through a Message.
     private class CountThread extends Thread {
-
         // Current value of the count
         int currentProgress;
         // Pause the count
@@ -147,7 +118,7 @@ public class ThreadRunOnUiActivity extends AppCompatActivity {
         // Stop the count (ends the thread)
         private boolean stop;
 
-        WeakReference<ThreadRunOnUiActivity> reference;
+        final WeakReference<ThreadRunOnUiActivity> reference;
 
         void setStop() {
             this.stop = true;
@@ -166,12 +137,9 @@ public class ThreadRunOnUiActivity extends AppCompatActivity {
             this.reference = new WeakReference<>(activity);
         }
 
-        /*
-         * Increases the count each 50ms until reaching the maximum count or the thread is stopped.
-         */
+        // Increases the count each 50ms until reaching the maximum count or the thread is stopped.
         @Override
         public void run() {
-
             // Starting new count, so do not pause nor stop the count
             pause = false;
             stop = false;
@@ -210,9 +178,7 @@ public class ThreadRunOnUiActivity extends AppCompatActivity {
         }
     }
 
-    /*
-     * Pauses the thread when the activity is going to be paused
-     */
+    // Pauses the thread when the activity is going to be paused
     @Override
     protected void onPause() {
         // If the background thread is running then pause it
@@ -222,9 +188,7 @@ public class ThreadRunOnUiActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    /*
-     * Stops the thread when the activity is going to be destroyed
-     */
+    // Stops the thread when the activity is going to be destroyed
     @Override
     protected void onDestroy() {
         // If the background thread is running then stop it
@@ -233,5 +197,4 @@ public class ThreadRunOnUiActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
-
 }
